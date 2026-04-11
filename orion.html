@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador del aterrizaje de la cápsula Orión - Artemis II</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+</head>
+<body>
+
+    <h1>Simulador de re entrada a la Tierra - Cápsula Orión </h1>
+    <p class="subtitulos">Misión Artemis II - Física 1 - Universidad Cenfotec</p>
+     <div class="controles">
+        <div class="ctrl-card">
+            <div class="ctrl-label"> Altitud inicial - Km</div>
+            <div class="ctrl-row">
+            <input type="range" min="80" max="400" value="120" step="1" id="alt" style="flex:1">
+            <span class="ctrl-val"><span id="alt-out">120</span>KM</span>
+        </div>
+     </div>
+     <div class="ctrl-card">
+        <div class="ctrl-label">Coeficiente de arrastre - cd </div>
+        <div class="ctrl-row">
+            <input type="range" id="cd" min="0.5" max="2.0" value="1.2" step="0.1" style="flex:1">
+            <span class="ctrl-val" id="cd-out">1.2</span>
+        </div>
+    </div>
+    <div class="ctrl-card">
+        <div class="ctrl-label">Masa de la cápsula - Kg </div>
+        <div class="ctrl-row">
+            <input type="range" id="masa" min="50000" max="15000" value="9300" step="100" style="flex:1">
+            <span class="ctrl-val"><span class="masa-out">9300</span>kg</span>
+        </div>
+    </div>
+    <div class="ctrl-card">
+        <div class="ctrl-label">Altitud despliegue paracaídas - KM </div>
+        <div class="ctrl-row">
+            <input type="range" id="para-alt" min="2" max="15" value="7" step="0.5" style="flex:1">
+            <span class="ctrl-val"><span id="para-out">7.0</span>km</span>
+        </div>
+    </div>
+</div>
+
+<div class="metricas">
+    <div class="metrica">
+        <div class="metrica-label">Energía potencial inicial</div>
+        <div class="metrica-val" id="ep-val">-</div>
+        <div class="metrica-unidad">GJ</div>
+    </div>
+    <div class="metrica">
+        <div class="metrica-label">Enegería cinética actual</div>
+        <div class="metrica-val" id="ek-val">-</div>
+        <div class="metrica-unidad">GJ</div>
+    </div>
+    <div class="metrica">
+        <div class="metrica-label">Velocidad</div>
+        <div class="metrica-val" id="vel-val">-</div>
+        <div class="metica-unidad">m/s</div>
+    </div>
+    <div class="metirca">
+        <div class="metrica-label">Fase</div>
+        <div class="metrica-val" id="fase-val" style="font: size 13px">-</div>
+        <div class="metric-unidad" id="fase-unidad"></div>
+    </div>
+</div>
+
+<div class="canvas-wrap">
+    <canvas id="simCanvas" width="700" height="320" style="width:100;height: 320px;display: block;"></canvas>
+</div>
+
+<div class="btn-row">
+    <button onclick="iniciarSim()">Iniciar simulación</button>
+    <button onabort="reiniciarSim()">Reiniciar simulación</button>
+</div>
+
+<div class="legend">
+    <span><span class="legend-dot" style="background: #378add;"></span>EK - Energía cinética</span>
+    <span><span class="legend-dot" style="background: #d85a30;">EP - Energía potencial (GJ)</span></span>
+</div>
+
+<div class="chart-wrap">
+    <canvas id="chartCanvas" role="img" aria-label="Gráfica de energía cinética y potencial durante la reentrada a la Tierra">Energía cinética y potencial durante la reentrada de la cápsula Orion.</canvas>
+</div>
+
+<div class="formulas">
+    <div class="formula-titulo">Ecucaciones físicas aplicadas</div>
+    <div class="formula-red">
+        <div class="formula-item">Ep = m × g × h</div>
+        <div class="formula-item">Ek =  ½ × m × v²</div>
+        <div class="formula-item">F_arrastre = ½ × m × v²</div>
+        <div class="formula-item">W_paracaidas = F_f × d</div>
+        <div class="formula-item">P = W</div>
+        <div class="formula-item">Ep_ini = Ek + W_rozamiento</div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+</body>
+
+
+
+
+</html>
