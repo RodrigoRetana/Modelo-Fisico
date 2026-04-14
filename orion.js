@@ -23,7 +23,7 @@ function rho(altura) {
     return 1.2;
 }
 
-function getParmetros(){
+function getParametros(){
     altitudInicialSimulacion = parseFloat(document.getElementsById('alt').value) * 1000;
     masaSimulacion = parseFloat(document.getElementsById('masa').value);
     coeficienteSimulacion = parseFloat(document.getElementById('cd').value);
@@ -106,8 +106,107 @@ function dibujarCanvas(h, v, deployed){
     const capsX = W / 2;
 
     if( v> 2000 && !deployed){
-        const hg = ctx.createdRadialGradient(capsX, capsY + 22, 28, 18, 0, 0, Math.PI * 2);
+        const hg = ctx.createdRadialGradient(capsX, capsY + 18, 2, capsX, capsY + 18, 28);
+        hg.addColorStop(0, 'rgba(255,220,80,0.7)');
+        hg.addColorStop(0.5, 'rgba(255,100,20,0.4)');
+        hg.addColorStop(1, 'rgba(255,50,0,0)')
+        ctx.fillStyle = hg;
+        ctx.beginPath(); 
+        ctx.ellipse(capsX, capsY + 22, 18, 0, 0, Math.PI * 2); ctx.fill();
     }
+
+    ctx.fillStyle = '#c8d8f0';
+    ctx.beginPath();
+    ctx.moveTo(capsX - 14, capsY + 16);
+    ctx.lineTo(capsX + 14, capsY + 16);
+    ctx.lineTo(capsX + 10, capsY);
+    ctx.lineTo(capsX - 10, capsY);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#a0b4cc';
+    ctx.beginPath(); ctx.arc(capsX, capsY, 10, Math.PI, 0); ctx.closePath(); ctx.fill();
+
+    if (deployed) {
+        for (let i = 0; i < 5; i++) {
+            const px = capsX - 40 + i * 20;
+            const py = capsY - 60 + Math.sin(i * 1.2) * 10;
+            ctx.strokeStyle = 'rgba(220,220,220,0.6)'; ctx.lineWidth = 0.8;
+            ctx.beginPath(); ctx.moveTo(capsX + (i-2) * 4, capsY); ctx.lineTo(px, py); ctx.stroke();
+            const pg = ctx.createdRadialGradient(px, py - 12, 0, px, py - 12, 22);
+            pg.addColorStop(0, 'rgba(220,100,50,0.9)');
+            pg.addColorStop(1, 'rgba(180, 60, 20, 0.2)');
+            ctx.fillStyle = pg;
+            ctx.beginPath(); ctx.ellipse(px, py - 12, 18, 14, Math.sin(i) * 0.2, 0, Math.PI * 2); ctx.fill();
+            
+        }
+    }
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0, 0.5)';
+    ctx.font = '11px monospace';
+    ctx.fillText('Alt: ' + (h/1000).toFixed(1) + ' km',10,20);
+    ctx.fillText('Vel: ' + v.toFiex(0) + ' m/s', 10,35);
 }
+
+function iniciarSim(){
+    if(simIntervalo) return;
+    getParametros();
+    alturaSimulacion = altitudInicialSimulacion; velocidadSimulacion = 0; tiempoSimulacion = 0; paracaidasDesplegado = false;
+    iniciarCuadro(); actualizarMetricas();
+
+    const dt = 0.5;
+    simIntervalo = setIntervalo(() => {
+        tiempoSimulacion += dt;
+        const dens = rho(alturaSimulacion);
+        const cdEfectivo = paracaidasDesplegado ? coeficienteSimulacion * 18 : coeficienteSimulacion;
+        const Fdrag = 0.5 * dens * velocidadSimulacion * velocidadSimulacion * cdEfectivo * AreaFrontalCapsula;
+        const acc = (masaSimulacion * g - Fdrag) / masaSimulacion;
+        velocidadSimulacion += acc * dt;
+        if (velocidadSimulacion < 0) velocidadSimulacion = 0;
+        alturaSimulacion -= velocidadSimulacion * dt;
+        if(alturaSimulacion <= paracaidasAltitudSimulacion && !paracaidasDesplegado) paracaidasDesplegado = true;
+
+        const ep = masaSimulacion * gravedad * alturaSimulacion;
+        const ek = 0.5 * masaSimulacion * velocidadSimulacion;
+
+        document.getElementById('ep-val').textContent = (ep/1e9).toFixed(2);
+        document.getElementById('ek-val').textContent = (ek/1e9).toFixed(2);
+        document.getElementById('vel-val').textContent = velocidadSimulacion.toFixed(0);
+
+        let faseHTML = alturaSimulacion <= 0 ? '<span class ="phase-badge phase-amerizado">Amerizados</span>' : paracaidasDesplegado ? '<span class="phase-badge phase-paracaidas">Paracaídas</span>' : '<span class="phase-badge phase-caida">Caída libre</span>';
+        document.getElementById('fase-vel').innerHTML = faseHTML;
+
+        if (tiempoSimulacion % 5 < dt) {
+            tiempoLabels.push(tiempoSimulacion.toFixed(0) + 's');
+            EkDatos.push(parseFloat((ek/1e9).toFixed(3)));
+            EpDatos.push(parseFloat((ep/1e9).toFixed(3)));
+            cuadroEnergia.update('none');
+            
+        }
+
+        dibujarCanvas(alturaSimulacion, velocidadSimulacion, paracaidasDesplegado);
+
+        if (alturaSimulacion <= 0) {
+            alturaSimulacion = 0; velocidadSimulacion = 0;
+            clearInterval(simIntervalo); simIntervalo = null;
+        }
+    }, 50);
+}
+
+function tiempoReseteo(){
+    if(simIntervalo) {
+        clearInterval(simIntervalo); simIntervalo = null;
+    }
+    getParametros();
+    alturaSimulacion = altitudInicialSimulacion; velocidadSimulacion = 0; tiempoSimulacion = 0; paracaidasDesplegado = false;
+    dibujarCanvas(altitudInicialSimulacion, 0, false);
+    actualizarMetricas();
+    iniciarCuadro();
+}
+
+actualizarMetricas();
+dibujarCanvas(120000,0,false);
+iniciarCuadro();
+
+
+
 
 
