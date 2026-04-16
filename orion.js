@@ -97,12 +97,12 @@ function dibujarCanvas(h, v, deployed) {
         ctx.beginPath(); ctx.arc(sx, sy, 0.8, 0, Math.PI * 2); ctx.fill();
     }
 
-    const groundY = H - 55;
+    const groundY = H - 65;
     ctx.fillStyle = '#0d2b4e';
     ctx.fillRect(0, groundY, W, H - groundY);
 
     const frac  = Math.max(0, Math.min(1, 1 - h / altitudInicialSimulacion));
-    const capsY = 30 + frac * (groundY - 50);
+    const capsY = 30 + frac * (groundY - 47);
     const capsX = W / 2;
 
     if (v > 2000 && !deployed) {
